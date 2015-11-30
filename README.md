@@ -48,7 +48,7 @@ minitel.textMode();
 ### Moving the cursor to a certain position
 Move the cursor to a certain location
 ```
-minitel.void moveCursorTo(HOME);
+minitel.moveCursorTo(HOME);
 ```
 Other possible positions are :
 
@@ -98,7 +98,7 @@ minitel.noCursor();
 
 ## Clear the screen
 
-Clear all characters and set the cursor position at the top left
+Clear all characters and move the cursor to the top-left of the screen
 
 ```
 minitel.clearScreen();
@@ -106,7 +106,7 @@ minitel.clearScreen();
 
 ## Sound
 
-You can trigger a bip by calling this fucntion with a duration (in milliseconds)
+You can trigger a bip by calling this function with a duration (in milliseconds)
 ```
 minitel.bip(1000);
 ```
@@ -141,36 +141,131 @@ minitel.useDefaultColors();
 
 ### Single characters
 
-minitel.
+Write a single char at the cursor position or at a given position (x,y)
+Return boolean (true/false) depending if the character is supported on Minitels
 
-Constants :
+```
+minitel.textChar('c');
+minitel.textChar('z', 1, 1);
+```
 
-//text(String s, int orientation)
-HORIZONTAL
-VERTICAL
+### Special characters
 
-// charSize()
-SIZE_NORMAL
-SIZE_DOUBLE_HEIGHT
-SIZE_DOUBLE_WIDTH
-SIZE_DOUBLE
+The Minitel's special characters can be typed by using the corresponding constants
 
-// Colors
-// bgColor()
-// textColor
+```
+minitel.specialChar(SPE_CHAR_CIRCLE);
+minitel.specialChar(SPE_CHAR_CIRCLE, 2, 10);
+```
 
-// specialChar()
-SPE_CHAR_BOOK
-SPE_CHAR_PARAGRAPH
-SPE_CHAR_ARROW_LEFT
-SPE_CHAR_ARROW_UP
-SPE_CHAR_ARROW_RIGHT
-SPE_CHAR_ARROW_DOWN
-SPE_CHAR_CIRCLE
-SPE_CHAR_MINUS_PLUS
-SPE_CHAR_1_4
-SPE_CHAR_1_2
-SPE_CHAR_3_4
-SPE_CHAR_UPPER_OE
-SPE_CHAR_LOWER_OE
-SPE_CHAR_BETA
+Available special characters are :
+- SPE_CHAR_BOOK
+- SPE_CHAR_PARAGRAPH
+- SPE_CHAR_ARROW_LEFT
+- SPE_CHAR_ARROW_UP
+- SPE_CHAR_ARROW_RIGHT
+- SPE_CHAR_ARROW_DOWN
+- SPE_CHAR_CIRCLE
+- SPE_CHAR_MINUS_PLUS
+- SPE_CHAR_1_4
+- SPE_CHAR_1_2
+- SPE_CHAR_3_4
+- SPE_CHAR_UPPER_OE
+- SPE_CHAR_LOWER_OE
+- SPE_CHAR_BETA
+
+
+### Text
+
+Write a text at the cursor position or at the given position (x,y)
+Text orientation can be horizontal (default) or vertical
+
+```
+minitel.text("Hello France");
+minitel.text("Hello France", 2, 10);
+minitel.text("Hello France", VERTICAL);
+minitel.text("Hello France", 1, 1, VERTICAL);
+```
+
+Orientation can be set using
+- HORIZONTAL
+- VERTICAL
+
+## Text size
+
+Text size can be set using
+```
+minitel.charSize(SIZE_DOUBLE);
+```
+
+Other options are
+- SIZE_NORMAL
+- SIZE_DOUBLE_HEIGHT
+- SIZE_DOUBLE_WIDTH
+- SIZE_DOUBLE
+
+
+## Graphic characters
+
+When in graphic Mode, the Minitel can display graphic characters.
+Graphic characters are 2 columns by 3 rows.
+
+|0|1|
+|1|0|
+|0|1|
+
+You can display a graphic char at the cursor position or at a given position as follow:
+
+```
+minitel.graphic("010101");
+minitel.graphic("100110", 10, 10);
+```
+
+The String content is split from top to bottom, left to right to fill the 2x3 pseudo-pixel grid. 
+Zeros will be filled with the current background color and other values with the current foreground color.
+The string has to be 6 characters
+
+For instance, "010101" will be split as
+
+|0|1|
+|0|1|
+|0|1|
+
+
+## Repeat
+
+One can repeat a single character or graphic several times
+
+```
+minitel.textChar('X');
+minitel.repeat(7);
+```
+
+## Blink
+
+You can make a text blink like this
+
+```
+minitel.blink();
+minitel.text("Blinking text");
+minitel.noBlink();
+```
+
+noBlink(); allows to switch back to the default display.
+
+## Pixelated effect 
+
+You can enable/disable a pixelated effect as follow
+
+```
+minitel.pixelate();
+minitel.noPixelate();
+```
+
+
+# Speed considerations
+
+When writing several times the same character consecutively, calling the repeat(); function will allow to display it much faster.
+
+
+
