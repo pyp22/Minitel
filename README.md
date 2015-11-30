@@ -53,15 +53,15 @@ minitel.void moveCursorTo(HOME);
 Other possible positions are :
 
 #### Cursor related
-HOME : beginning of the current line
-LINE_END : end of the current line
+- HOME : beginning of the current line
+- LINE_END : end of the current line
 
 #### Screen related
-TOP_LEFT : top left of the screen
-TOP_RIGHT : top right of the screen
-BOTTOM_LEFT : bottom left of the screen
-BOTTOM_RIGHT : bottom right of the screen
-CENTER : center of the screen
+- TOP_LEFT : top left of the screen
+- TOP_RIGHT : top right of the screen
+- BOTTOM_LEFT : bottom left of the screen
+- BOTTOM_RIGHT : bottom right of the screen
+- CENTER : center of the screen
 
 ### Moving the cursor to an XY position
 
@@ -96,7 +96,7 @@ minitel.cursor();
 minitel.noCursor();
 ```
 
-### Clear the screen
+## Clear the screen
 
 Clear all characters and set the cursor position at the top left
 
@@ -104,14 +104,14 @@ Clear all characters and set the cursor position at the top left
 minitel.clearScreen();
 ```
 
-### Sound
+## Sound
 
 You can trigger a bip by calling this fucntion with a duration (in milliseconds)
 ```
 minitel.bip(1000);
 ```
 
-### Colors
+## Colors
 
 You can change the text or graphics color and background color
 
@@ -137,7 +137,7 @@ You can reset colors to their default values (white characters, black background
 minitel.useDefaultColors();
 ```
 
-### Display text
+## Display text
 
 ### Single characters
 
