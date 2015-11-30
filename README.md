@@ -178,6 +178,7 @@ Available special characters are :
 ### Text
 
 Write a text at the cursor position or at the given position (x,y)
+
 Text orientation can be horizontal (default) or vertical
 
 ```
@@ -211,7 +212,9 @@ When in graphic Mode, the Minitel can display graphic characters.
 Graphic characters are 2 columns by 3 rows.
 
 |0|1|
+-----
 |1|0|
+-----
 |0|1|
 
 You can display a graphic char at the cursor position or at a given position as follow:
@@ -222,7 +225,9 @@ minitel.graphic("100110", 10, 10);
 ```
 
 The String content is split from top to bottom, left to right to fill the 2x3 pseudo-pixel grid. 
+
 Zeros will be filled with the current background color and other values with the current foreground color.
+
 The string has to be 6 characters
 
 For instance, "010101" will be split as
