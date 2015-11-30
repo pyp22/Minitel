@@ -1,7 +1,40 @@
-Minitel
-=======
+#Minitel library for Arduino
 
-Minitel library for Arduino
+This library provides a way to create screens for the [Minitel](https://en.wikipedia.org/wiki/Minitel) without having to dig into the complexity of the system.
+
+##Schematic
+A DIN 45º plug is required to plug the Arduino to the Minitel
+
+![Alt text](/images/DIN.png?raw=true "Schematic")
+
+##External libraries
+This library is using SoftwareSerial, please install it prior to compiling any Minitel sketch.
+
+##Constructor:
+
+Default constructor, using Arduino PINs 6 and 7 for TX/RX
+```
+#include <SoftwareSerial.h>
+#include <Minitel.h>
+Minitel minitel;
+
+void setup() {
+}
+...
+```
+
+Custom constructor using other Arduino PINs for TX/RX
+```
+#include <SoftwareSerial.h>
+#include <Minitel.h>
+Minitel minitel(10, 11);
+
+void setup() {
+}
+...
+```
+
+
 
 Constants :
 
