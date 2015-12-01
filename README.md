@@ -3,16 +3,19 @@
 This library provides a way to create screens for the [Minitel](https://en.wikipedia.org/wiki/Minitel) without having to dig into the complexity of the system.
 
 ##Schematic
+
 A DIN 45º plug is required to plug the Arduino to the Minitel
 
 ![Alt text](/images/DIN.png?raw=true "Schematic")
 
 ##External libraries
+
 This library is using SoftwareSerial, please install it prior to compiling any Minitel sketch.
 
 ##Constructor
 
 Default constructor, using Arduino PINs 6 and 7 for TX/RX
+
 ```
 #include <SoftwareSerial.h>
 #include <Minitel.h>
@@ -24,6 +27,7 @@ void setup() {
 ```
 
 Custom constructor using other Arduino PINs for TX/RX
+
 ```
 #include <SoftwareSerial.h>
 #include <Minitel.h>
@@ -46,10 +50,13 @@ minitel.textMode();
 ## Cursor positionning
 
 ### Moving the cursor to a certain position
+
 Move the cursor to a certain location
+
 ```
 minitel.moveCursorTo(HOME);
 ```
+
 Other possible positions are :
 
 #### Cursor related
@@ -65,8 +72,10 @@ Other possible positions are :
 
 ### Moving the cursor to an XY position
 
-Move the cursor to a given positioni (x,y), anywhere in the screen
+Move the cursor to a given position (x,y), anywhere in the screen
+
 x has a max of 40
+
 y has a max of 24
 
 ```
@@ -76,7 +85,9 @@ minitel.moveCursorTo(10, 2);
 ### Moving the cursor in a certain direction
 
 Move the cursor based on its current position
+
 You can specify how many times you the cursor should be moved this direction
+
 ```
 minitel.moveCursor(UP);
 minitel.moveCursor(RIGHT, 10);
@@ -107,6 +118,7 @@ minitel.clearScreen();
 ## Sound
 
 You can trigger a bip by calling this function with a duration (in milliseconds)
+
 ```
 minitel.bip(1000);
 ```
@@ -142,6 +154,7 @@ minitel.useDefaultColors();
 ### Single characters
 
 Write a single char at the cursor position or at a given position (x,y)
+
 Return boolean (true/false) depending if the character is supported on Minitels
 
 ```
@@ -217,11 +230,15 @@ minitel.graphic("010101");
 minitel.graphic("100110", 10, 10);
 ```
 
-The String content is split from top to bottom, left to right to fill the 2x3 pseudo-pixel grid. 
-The string has to be 6 characters
-
 Graphic characters are 2 columns by 3 rows.
+
+The string content is split from top to bottom, left to right to fill the 2x3 pseudo-pixel grid. 
+
+The string has to be exactly 6 characters.
+
 Zeros will be filled with the current background color and other values with the current foreground color.
+
+Some examples:
 
 ![Alt text](/images/GraphicChar.jpg?raw=true "Graphic character")
 
@@ -256,10 +273,51 @@ minitel.pixelate();
 minitel.noPixelate();
 ```
 
+# Undocumented
 
-# Speed considerations
+Here is a list of undocumented functions:
+
+```
+minitel.incrustation();
+minitel.noIncrustation();
+
+minitel.lineMask();
+minitel.noLineMask();
+                    
+minitel.standardVideo();
+minitel.invertVideo();
+minitel.transparentVideo();
+```
+
+# Advanced
+
+
+
+## Speed considerations
 
 When writing several times the same character consecutively, calling the repeat(); function will allow to display it much faster.
 
 
+## Serial print
+
+If you intend to use the Minitel commands directly (in this case, refer to the device's technical documentation) you can send them directly to the terminal using 
+
+```
+minitel.serialprint7(86);
+```
+
+
+## Text
+
+You can get the byte corresponding to a given character by using the following function
+
+```
+byte b = minitel.getCharByte('c');
+```
+
+This byte can then be used to print a character directly by using 
+
+```
+minitel.serialprint7(b);
+```
 
