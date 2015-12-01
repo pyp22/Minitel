@@ -938,26 +938,26 @@ void Minitel::rect(byte c, int x, int y, int w, int h) {
 void Minitel::spiral(int x, int y, int siz, int c) {
   int curSiz = 1;
   // Center
-  specialChar(x, y, c);
+  specialChar(c, x, y);
   x++;
   // Spiral    
   for (int i=0; i< siz; i++) {
     for (int j=0; j<curSiz; j++) {
-      specialChar(x, y, c);
+      specialChar(c, x, y);
       y++;
     }
     curSiz++;
     for (int j=0; j<curSiz; j++) {
-      specialChar(x, y, c);
+      specialChar(c, x, y);
       x--;
     }
     for (int j=0; j<curSiz; j++) {
-      specialChar(x, y, c);
+      specialChar(c, x, y);
       y--;
     }
     curSiz++;   
     for (int j=0; j<curSiz; j++) {
-      specialChar(x, y, c);
+      specialChar(c, x, y);
       x++;
     }    
   }
