@@ -154,15 +154,15 @@ private :
 	boolean printAccentChar(char c);
 	void printAccent(int index);
 	char getAccentLetter(int letterIndex);
+	void refreshSettings();
 
 
 public :
 
 	Minitel();
 	Minitel(int rx, int tx);
-	void refreshSettings();
-	byte getGraphicChar(String s);
 	void serialprint7(byte b);
+	byte getGraphicChar(String s);
 	void graphic(String s, int x, int y);
 	void graphic(String s);
 	void textByte(byte c);
