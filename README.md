@@ -119,6 +119,8 @@ minitel.clearScreen();
 
 You can trigger a bip by calling this function with a duration (in milliseconds)
 
+The duration has to be greater than 200ms
+
 ```
 minitel.bip(1000);
 ```
@@ -273,9 +275,85 @@ minitel.pixelate();
 minitel.noPixelate();
 ```
 
+
+## Prefefined drawing functions
+
+### Rectangle
+
+Draw a rectangle using  a given character
+
+Arguments are:
+- character
+- top left x position
+- top left y position
+- rectangle width
+- rectangle height
+
+```
+minitel.rect('X', 1, 1, 20, 20);
+```
+
+Draw a rectangle using  a given character, provided as a byte
+
+Arguments are:
+- byte 
+- top left x position
+- top left y position
+- rectangle width
+- rectangle height
+
+```
+minitel.rect(92, 10, 10, 5, 5);
+```
+
+### Spiral
+
+Draw a spiral
+
+Arguments are:
+- byte 
+- center x position
+- center y position
+- size
+
+```
+minitel.spiral(int x, int y, int siz, int c);
+```
+
+## Keyboard input
+
+Refer to the MinitelAsKeyboard example for more details
+
+WARNING : It doesn't seem to be working perfectly
+
+Another option is to hack the keyboard using a MPC23017 chip and get the input directly.
+
+I'll link to a tutorial and post samples when ready.
+
+### Get the keyboard's key pressed
+
+```
+char c = getKey();
+```
+
+### Get the key code
+
+```
+byte keyCode = getKeyCode();
+```
+
+### Check if it is a menu key
+
+```
+boolean isMenuKey = isMenuKey();
+```
+
+
 # Undocumented
 
 Here is a list of undocumented functions:
+
+Most of them don't seem to work on the most common Minitel models 
 
 ```
 minitel.incrustation();
@@ -287,6 +365,14 @@ minitel.noLineMask();
 minitel.standardVideo();
 minitel.invertVideo();
 minitel.transparentVideo();
+```
+
+# Unimplemented function
+
+This function does nothing for the moment
+
+```
+minitel.setMaxSpeed();
 ```
 
 # Advanced
