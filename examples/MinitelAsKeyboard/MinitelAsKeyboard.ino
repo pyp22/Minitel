@@ -1,66 +1,53 @@
 /**
- * Minitel library for Arduino (v0.1) / May 2013
- * http://github.com/01010101/Minitel
- *
- * By Jerome Saint-Clair aka 01010101
- * http://saint-clair.net
- * 
- * For the Graffiti Research Lab France
- * http://graffitiresearchlab.fr
- * 
- * Based on works by the Tetalab (Fabrice, Renaud, PG & Phil)
- * http://tetalab.org
- */
+   Minitel library for Arduino (v0.1) / May 2013
+   http://github.com/01010101/Minitel
+
+   By Jerome Saint-Clair aka 01010101
+   http://saint-clair.net
+
+   For the Graffiti Research Lab France
+   http://graffitiresearchlab.fr
+
+   Based on works by the Tetalab (Fabrice, Renaud, PG & Phil)
+   http://tetalab.org
+*/
 
 /**
- * Use Fnct T + E to disable echo
- *
- */
+   Use Fnct T + E to disable echo
 
-#include <SoftwareSerial.h>
+*/
+
 #include <Minitel.h>
 
-Minitel m(6,7);
-boolean input = true;
-char key = '^';
-boolean isMenu = false;
+Minitel minitel;
 
 void setup() {
-  m.clearScreen();
-  Serial.begin(1200);
-  m.textMode();
-  m.cursor();
+  minitel.clearScreen();
+  minitel.textMode();
+  minitel.cursor();
 }
 
 void loop() {
-  // Read key each 2 loops only
-  if (input) {
-    key = m.getKey();
-    if (m.isMenuKey()) {
-     isMenu = true; 
+  minitel.listen(); // Listen for info coming from the Minitel
+  minitel.readKey(); // Try to read a key press
+
+  if (minitel.isCharacterKey()) {
+    char key = minitel.getCharacterKey();
+    minitel.textChar(key);
+  }
+  else if (minitel.isMenuKey()) {
+    int key = minitel.getMenuKey();
+    if (key == RETOUR) { // Return
+      minitel.moveCursorTo(HOME);
+      minitel.moveCursor(DOWN, 1);
+    }
+    else if (key == CORRECTION) {
+      minitel.moveCursor(LEFT, 1);
+      minitel.textChar(' ');
+      minitel.moveCursor(LEFT, 1);          
+    }
+    else if (key == ANNULATION) {
+      minitel.clearScreen();
     }
   }
-  else {
-   if (key != '^') {
-     if (isMenu) {
-       if (key == '3') { // Return
-        m.moveCursorTo(HOME);
-        m.moveCursor(DOWN,1);
-       }
-       else if (key == '6') { // Correction
-        m.moveCursor(LEFT,1);
-        m.textChar(' ');
-        m.moveCursor(LEFT, 1);
-       }
-       else { // Clear screen
-        m.clearScreen();
-       }
-      isMenu = false; 
-     }
-     else { // Display char
-       m.textChar(key);
-     }
-   } 
-  }
-  input = !input;
 }

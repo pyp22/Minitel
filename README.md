@@ -169,22 +169,29 @@ minitel.textChar('z', 1, 1);
 The Minitel's special characters can be typed by using the corresponding constants
 
 ```
-minitel.specialChar(SPE_CHAR_CIRCLE);
-minitel.specialChar(SPE_CHAR_CIRCLE, 2, 10);
+minitel.specialChar(SPE_CHAR_DEGREE);
+minitel.specialChar(SPE_CHAR_DEGREE, 2, 10);
 ```
 
 Available special characters are :
-- SPE_CHAR_BOOK
-- SPE_CHAR_PARAGRAPH
+- SPE_CHAR_POUND
+- SPE_CHAR_DOLLAR
+- SPE_CHAR_HASHTAG
 - SPE_CHAR_ARROW_LEFT
 - SPE_CHAR_ARROW_UP
 - SPE_CHAR_ARROW_RIGHT
 - SPE_CHAR_ARROW_DOWN
-- SPE_CHAR_CIRCLE
+- SPE_CHAR_DEGREE
 - SPE_CHAR_MINUS_PLUS
+- SPE_CHAR_DIVIDE
 - SPE_CHAR_1_4
 - SPE_CHAR_1_2
 - SPE_CHAR_3_4
+- SPE_CHAR_GRAVE (needs a supported vowel right after)
+- SPE_CHAR_ACUTE (needs a supported vowel right after)
+- SPE_CHAR_CIRCUMFLEX (needs a supported vowel right after)
+- SPE_CHAR_UMLAUT (needs a supported vowel right after)
+- SPE_CHAR_CEDIL 
 - SPE_CHAR_UPPER_OE
 - SPE_CHAR_LOWER_OE
 - SPE_CHAR_BETA
@@ -324,28 +331,38 @@ minitel.spiral(int x, int y, int siz, int c);
 
 Refer to the MinitelAsKeyboard example for more details
 
-WARNING : It doesn't seem to be working perfectly
+WARNINGS
+- It doesn't seem to be working perfectly when you update display in the meantime
+- Some keys can't be captured (ie: direction keys)
+- The keyboard may enter in sleep mode after some time, meaning there will be some delay when typing the first key after it went to sleep
 
 Another option is to hack the keyboard using a MPC23017 chip and get the input directly.
-
 I'll link to a tutorial and post samples when ready.
 
-### Get the keyboard's key pressed
+### Read and decode the input and then store value(s)
+
+minitel.readKey();
+
+### Check if a key was pressed
+
+boolean pressed = minitel.keyTyped();
+
+### Check which kind of key was pressed (returns a boolean)
 
 ```
-char c = getKey();
+minitel.isMenuKey();
+minitel.isSpecialCharacterKey();
+minitel.isCharacterKey();
+minitel.accentKeyStored();
 ```
 
-### Get the key code
+### Get the key
 
 ```
-byte keyCode = getKeyCode();
-```
-
-### Check if it is a menu key
-
-```
-boolean isMenuKey = isMenuKey();
+int menu = minitel.getMenuKey(); // Can be checked against the menu key constants
+int specialChar = minitel.getSpecialCharacterKey(); // Can be checked agains the special characters constants
+char character = minitel.getCharacterKey(); // If 
+int accent = minitel.getAccentKey(); // In addition to checking if a character and in case of a lowercase vowel
 ```
 
 

@@ -1,5 +1,5 @@
 /**
- * Minitel library for Arduino (v0.1) / May 2013
+ * Minitel library for Arduino (v0.2) / April 2015
  * http://github.com/01010101/Minitel
  *
  * By Jerome Saint-Clair aka 01010101
@@ -105,33 +105,63 @@
 #define BIP 7
 
 // Accents
-#define ACCUTE 65
-#define GRAVE 66
-#define CIRCUMFLEX 67
-#define UMLAUT 72
+// #define ACCUTE 65
+// #define GRAVE 66
+// #define CIRCUMFLEX 67
+// #define UMLAUT 72
 
 #define SUB_ARTICLE_SEPARATOR 31;
 
 // Preceeded by 25
-#define SPE_CHAR_BOOK 35
+#define SPE_CHAR_POUND 35
+#define SPE_CHAR_DOLLAR 36
+#define SPE_CHAR_HASHTAG 38
 #define SPE_CHAR_PARAGRAPH 39
 #define SPE_CHAR_ARROW_LEFT 44
 #define SPE_CHAR_ARROW_UP 45
 #define SPE_CHAR_ARROW_RIGHT 46
 #define SPE_CHAR_ARROW_DOWN 47
-#define SPE_CHAR_CIRCLE 48
+#define SPE_CHAR_DEGREE 48
 #define SPE_CHAR_MINUS_PLUS 49
-#define SPE_CHAR_1_4 60
-#define SPE_CHAR_1_2 61
-#define SPE_CHAR_3_4 62
+#define SPE_CHAR_DIVIDE 56
+#define SPE_CHAR_1_4 60 // output only ?
+#define SPE_CHAR_1_2 61 // output only ?
+#define SPE_CHAR_3_4 62 // output only ?
+#define SPE_CHAR_GRAVE 65
+#define SPE_CHAR_ACUTE 66
+#define SPE_CHAR_CIRCUMFLEX 67
+#define SPE_CHAR_UMLAUT 72
+#define SPE_CHAR_CEDIL 75
 #define SPE_CHAR_UPPER_OE 106
 #define SPE_CHAR_LOWER_OE 122
 #define SPE_CHAR_BETA 123
 
+// Non Arduino characters
+#define SPE_CHAR_ARROW_UP2 94
+#define SPE_CHAR_PIPE_BOTTOM 95
+#define SPE_CHAR_PIPE_MIDDLE 96
+#define SPE_CHAR_PIPE_LEFT 123
+#define SPE_CHAR_PIPE_CENTER 124
+#define SPE_CHAR_PIPE_RIGHT 125
+#define SPE_CHAR_PIPE_TOP 126
+
+// TODO Escape character handling ???
+
+#define SOMMAIRE 198
+#define ANNULATION 197
+#define RETOUR 66
+#define REPETITION 195
+#define GUIDE 68
+#define CORRECTION 71
+#define SUITE 72
+#define ENVOI 65
 
 class Minitel : public SoftwareSerial {
 
 private :	
+
+	String accents = "àáâäèéêëìíîïòóôöùúûü";
+	
 	byte _currentBgColor;
 	byte _currentTextColor;
 	byte _currentMode;
@@ -141,6 +171,14 @@ private :
 	boolean _currentBlink;
 	boolean _currentShowCursor;
 	boolean _menuKeyPressed;
+			
+	int _menuKey;
+	int _specialCharacterKey;
+	int _characterKey;
+	int _accentKey;
+	
+	char _nullChar = '~';
+
 	void init();
 	void mode(byte mode);
 	void cursor(boolean b);
@@ -149,11 +187,15 @@ private :
 	void video(byte v);
 	void incrustation(boolean b);
 	void lineMask(boolean b);
+	
 	boolean isValidChar(byte index);
+	boolean isSpecialChar(byte c);
+
 	boolean isAccent(char c);
 	boolean printAccentChar(char c);
 	void printAccent(int index);
 	char getAccentLetter(int letterIndex);
+
 	void refreshSettings();
 
 
@@ -161,10 +203,13 @@ public :
 
 	Minitel();
 	Minitel(int rx, int tx);
+
 	void serialprint7(byte b);
+
 	byte getGraphicChar(String s);
 	void graphic(String s, int x, int y);
 	void graphic(String s);
+
 	void textByte(byte c);
 	void textByte(byte b, int x, int y);
 	boolean textChar(byte c);
@@ -176,22 +221,33 @@ public :
 	byte getCharByte(char c);
 	void specialChar(byte c, int x, int y);
 	void specialChar(byte c);
+	void semiGraphic(byte b, int x, int y);
+	void semiGraphic(byte b);
+
 	void repeat(byte n);
+
 	void bgColor(byte c);
 	void textColor(byte c);
 	void useDefaultColors();
+	
 	void moveCursorTo(byte x, byte y);
 	void moveCursor(byte dir);
 	void moveCursorTo(byte location);
 	void moveCursor(byte dir, int n);
+	
 	void cursor();
 	void noCursor();
+	
 	void clearScreen();
+	
 	void graphicMode();
 	void textMode();
+	
 	void blink();
 	void noBlink();
+	
 	void charSize(byte type);
+	
 	void incrustation();
 	void noIncrustation();
 	void pixelate();
@@ -201,14 +257,32 @@ public :
 	void standardVideo();
 	void invertVideo();
 	void transparentVideo();
+	
 	void setMaxSpeed();
-	void bip(long duration);
-	char getKey();
-	byte getKeyCode();
-	boolean isMenuKey();
+	
+	void bip(unsigned long duration);
+
 	void rect(char c, int x, int y, int w, int h);
 	void rect(byte c, int x, int y, int w, int h);
 	void spiral(int x, int y, int siz, int c);
+
+	void readKey();
+	boolean keyTyped();
+
+	boolean isMenuKey();
+	int getMenuKey();
+
+	boolean isSpecialCharacterKey();
+	int getSpecialCharacterKey();
+
+ 	boolean accentKeyStored();
+ 	int getAccentKey();
+
+	boolean isCharacterKey();
+	boolean isSerializableKey();
+	char getCharacterKey();
+
+
 
 };
 

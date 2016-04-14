@@ -1,29 +1,29 @@
 /**
-   Minitel library for Arduino (v0.1) / May 2013
-   http://github.com/01010101/Minitel
-
-   By Jerome Saint-Clair aka 01010101
-   http://saint-clair.net
-
-   For the Graffiti Research Lab France
-   http://graffitiresearchlab.fr
-
-   Based on works by the Tetalab (Fabrice, Renaud, PG & Phil)
-   http://tetalab.org
-*/
+ * Minitel library for Arduino (v0.1) / May 2013
+ * http://github.com/01010101/Minitel
+ *
+ * By Jerome Saint-Clair aka 01010101
+ * http://saint-clair.net
+ * 
+ * For the Graffiti Research Lab France
+ * http://graffitiresearchlab.fr
+ * 
+ * Based on works by the Tetalab (Fabrice, Renaud, PG & Phil)
+ * http://tetalab.org
+ */
 
 
 #include <SoftwareSerial.h>
 #include <Minitel.h>
 
-Minitel m(6, 7);
+Minitel m(6,7);
 
 void setup() {
-
+  
 }
 
 void loop() {
-
+ 
   long pause = 2000;
 
   demoColor();
@@ -46,14 +46,14 @@ void loop() {
 
   demoCharacters();
   delay(pause);
-
+  
 }
 
 /**
-
-   DEMOS
-
-*/
+ *
+ * DEMOS
+ *
+ */
 
 // Graphic characters
 
@@ -66,76 +66,76 @@ void demoGraphics(boolean underline) {
   m.text(" GRAPHICS DEMO ", 4, 1);
   m.bgColor(BLACK);
 
-
+  
   m.graphicMode();
-
+  
   if (underline) {
     m.pixelate();
   }
   m.noCursor();
 
-  // No color
+  // No color 
   m.useDefaultColors();
 
   int xPos = 5;
   int yPos = 5;
   m.moveCursorTo(xPos, yPos);
   int x = 32;
-  for (int i = x; i < x + 16; i++) {
+  for (int i=x; i<x+16; i++) {
     m.serialprint7(i);
     m.serialprint7(9);
   }
 
-  m.moveCursorTo(xPos, yPos + 2);
-  for (int i = x + 16; i < x + 32; i++) {
+  m.moveCursorTo(xPos, yPos+2);
+  for (int i=x+16; i<x+32; i++) {
     m.serialprint7(i);
     m.serialprint7(9);
   }
 
-  m.moveCursorTo(xPos, yPos + 4);
-  for (int i = x + 32; i < x + 48; i++) {
+  m.moveCursorTo(xPos, yPos+4);
+  for (int i=x+32; i<x+48; i++) {
     m.serialprint7(i);
     m.serialprint7(9);
   }
 
-  m.moveCursorTo(xPos, yPos + 6);
-  for (int i = x + 48; i < x + 64; i++) {
+  m.moveCursorTo(xPos, yPos+6);
+  for (int i=x+48; i<x+64; i++) {
     m.serialprint7(i);
     m.serialprint7(9);
-  }
+  } 
 
   // Colored
   m.bgColor(RED);
   m.textColor(WHITE);
 
-  m.moveCursorTo(xPos, yPos + 10);
+  m.moveCursorTo(xPos, yPos+10);
   x = 32;
-  for (int i = x; i < x + 16; i++) {
+  for (int i=x; i<x+16; i++) {
     m.serialprint7(i);
     m.serialprint7(9);
   }
 
-  m.moveCursorTo(xPos, yPos + 12);
-  for (int i = x + 16; i < x + 32; i++) {
+  m.moveCursorTo(xPos, yPos+12);
+  for (int i=x+16; i<x+32; i++) {
     m.serialprint7(i);
     m.serialprint7(9);
   }
 
-  m.moveCursorTo(xPos, yPos + 14);
-  for (int i = x + 32; i < x + 48; i++) {
+  m.moveCursorTo(xPos, yPos+14);
+  for (int i=x+32; i<x+48; i++) {
     m.serialprint7(i);
     m.serialprint7(9);
   }
 
-  m.moveCursorTo(xPos, yPos + 16);
-  for (int i = x + 48; i < x + 64; i++) {
+  m.moveCursorTo(xPos, yPos+16);
+  for (int i=x+48; i<x+64; i++) {
     m.serialprint7(i);
     m.serialprint7(9);
   }
-
+  
   m.useDefaultColors();
   m.noPixelate();
-
+  
 }
 
 
@@ -192,80 +192,89 @@ void demoCharacters() {
   int yPos = 5;
   m.cursor();
 
-  // a->z
-  m.moveCursorTo(xPos, yPos);
-  for (int i = 97; i < 97 + 26; i++) {
-    m.serialprint7(i);
-  }
-
-  // A->Z
-  m.moveCursorTo(xPos, yPos + 1);
-  for (int i = 65; i < 65 + 26; i++) {
-    m.serialprint7(i);
-  }
+  m.text("abcdefghijklmnopqrstuvwxyz", xPos, yPos);
+  m.text("ABCDEFGHIJKLMNOPQRSTUVWXYZ", xPos, yPos+1);
 
   // 0-9 + punctuation marks, ...
-  m.moveCursorTo(xPos, yPos + 2);
-  for (int i = 33; i < 33 + 32; i++) {
-    m.serialprint7(i);
-  }
-  for (int i = 91; i < 97; i++) {
-    m.serialprint7(i);
-  }
+  m.text("!\"#$%&'()*+,-./0123456789",xPos, yPos+2);
+  m.text(":;<=>?@[\\]",xPos, yPos+3);
+
+  m.moveCursorTo(xPos, yPos+2);
+  m.serialprint7(96);
+  m.serialprint7(95);
+  m.serialprint7(94);
+  m.serialprint7(123);
+  m.serialprint7(124);
+  m.serialprint7(125);
+  m.serialprint7(126);
 
   // Colored characters
-  m.moveCursorTo(xPos, yPos + 3);
+  m.moveCursorTo(xPos, yPos+4);
   m.textColor(RED);
-  for (int i = 97; i < 97 + 26; i++) {
+  
+  for (int i=97; i<97+26; i++) {
     m.serialprint7(i);
   }
   m.textColor(WHITE);
 
   // Double width 1/2
-  m.moveCursorTo(xPos, yPos + 4);
   m.charSize(SIZE_DOUBLE_WIDTH);
-  for (int i = 97; i < 97 + 13; i++) {
-    m.serialprint7(i);
-  }
-  m.moveCursorTo(xPos, yPos + 5);
-  for (int i = 97 + 13; i < 97 + 26; i++) {
-    m.serialprint7(i);
-  }
+  m.text("abcdefghijklmnopqrstuvwxyz", xPos, yPos+5);
+  m.text("ABCDEFGHIJKLMNOPQRSTUVWXYZ", xPos, yPos+6);
   m.charSize(SIZE_NORMAL);
 
   // Special characters
-  m.moveCursorTo(xPos, yPos + 6);
+  m.moveCursorTo(xPos, yPos+7);
   byte chars[] = {
-    SPE_CHAR_BOOK, SPE_CHAR_PARAGRAPH, SPE_CHAR_ARROW_LEFT, SPE_CHAR_ARROW_UP, SPE_CHAR_ARROW_RIGHT, SPE_CHAR_ARROW_DOWN, SPE_CHAR_CIRCLE, SPE_CHAR_MINUS_PLUS, SPE_CHAR_1_4, SPE_CHAR_1_2, SPE_CHAR_3_4, SPE_CHAR_UPPER_OE, SPE_CHAR_LOWER_OE, SPE_CHAR_BETA
-  };
-  for (int i = 0; i < sizeof(chars); i++) {
+SPE_CHAR_POUND,
+SPE_CHAR_DOLLAR,
+SPE_CHAR_HASHTAG,
+SPE_CHAR_PARAGRAPH,
+SPE_CHAR_ARROW_LEFT,
+SPE_CHAR_ARROW_UP,
+SPE_CHAR_ARROW_RIGHT,
+SPE_CHAR_ARROW_DOWN,
+SPE_CHAR_DEGREE,
+SPE_CHAR_MINUS_PLUS,
+SPE_CHAR_DIVIDE,
+SPE_CHAR_1_4,
+SPE_CHAR_1_2,
+SPE_CHAR_3_4,
+SPE_CHAR_GRAVE,
+SPE_CHAR_ACUTE,
+SPE_CHAR_CIRCUMFLEX,
+SPE_CHAR_UMLAUT,
+SPE_CHAR_CEDIL,
+SPE_CHAR_UPPER_OE,
+SPE_CHAR_LOWER_OE,
+SPE_CHAR_BETA
+//SPE_CHAR_ARROW_UP2,
+//SPE_CHAR_PIPE_BOTTOM,
+//SPE_CHAR_PIPE_MIDDLE,
+//SPE_CHAR_PIPE_LEFT,
+//SPE_CHAR_PIPE_CENTER,
+//SPE_CHAR_PIPE_RIGHT,
+//SPE_CHAR_PIPE_TOP
+};
+  for (int i=0; i<sizeof(chars); i++) {
     m.specialChar(chars[i]);
   }
 
   // Blink
-  m.moveCursorTo(xPos, yPos + 7);
   m.blink();
-  for (int i = 97; i < 97 + 26; i++) {
-    m.serialprint7(i);
-  }
+  m.text("ABCDEFGHIJKLMNOPQRSTUVWXYZ", xPos, yPos+8);
   m.noBlink();
 
   // Invert video
-  m.moveCursorTo(xPos, yPos + 8);
   m.invertVideo();
-  for (int i = 97; i < 97 + 26; i++) {
-    m.serialprint7(i);
-  }
+  m.text("ABCDEFGHIJKLMNOPQRSTUVWXYZ", xPos, yPos+9);
   m.standardVideo();
 
 
   // Transparent
   // No effet on Minitel 1
-  m.moveCursorTo(xPos, yPos + 9);
   m.transparentVideo();
-  for (int i = 97; i < 97 + 26; i++) {
-    m.serialprint7(i);
-  }
+  m.text("ABCDEFGHIJKLMNOPQRSTUVWXYZ", xPos, yPos+10);
   m.standardVideo();
 }
 
@@ -277,8 +286,8 @@ void demoBip() {
   m.bgColor(RED);
   m.text(" BIP DEMO ", 4, 1);
   m.bgColor(BLACK);
-
-  for (int i = 0; i < 2; i++) {
+  
+  for (int i=0; i<2; i++) {
     m.bip(50);
     delay(700);
     m.bip(5);
@@ -303,7 +312,7 @@ void demoText() {
   m.noBlink();
   m.text("This is a test", 13, 15);
   m.text("****************************************", 1, 20);
-  m.noCursor();
+  m.noCursor(); 
 }
 
 void demoColor() {
@@ -318,8 +327,8 @@ void demoColor() {
   m.bgColor(RED);
   m.rect((byte) m.getGraphicChar("011001"), 4, 4, 33, 20);
 
-  for (int i = 0; i < 18; i++) {
-    m.moveCursorTo(5, 5 + i);
+  for(int i=0; i<18; i++) {
+    m.moveCursorTo(5, 5+i);
 
     m.textColor(WHITE);
     m.graphic("111111");

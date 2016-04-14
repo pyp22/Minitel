@@ -1,18 +1,18 @@
 /**
- * Minitel library for Arduino (v0.1) / May 2013
- * http://github.com/01010101/Minitel
- *
- * By Jerome Saint-Clair aka 01010101
- * http://saint-clair.net
- * 
- * For the Graffiti Research Lab France
- * http://graffitiresearchlab.fr
- * 
- * Based on works by the Tetalab (Fabrice, Renaud, PG & Phil)
- * http://tetalab.org
- */
- 
- #include "Arduino.h"
+   Minitel library for Arduino (v0.2) / April 2015
+   http://github.com/01010101/Minitel
+
+   By Jerome Saint-Clair aka 01010101
+   http://saint-clair.net
+
+   For the Graffiti Research Lab France
+   http://graffitiresearchlab.fr
+
+   Based on works by the Tetalab (Fabrice, Renaud, PG & Phil)
+   http://tetalab.org
+*/
+
+#include "Arduino.h"
 #include "SoftwareSerial.h"
 #include "Minitel.h"
 
@@ -26,24 +26,24 @@ boolean _currentBlink = false;
 boolean _currentShowCursor = false;
 
 
-Minitel::Minitel() : SoftwareSerial(6,7) {
-	init();
+Minitel::Minitel() : SoftwareSerial(6, 7) {
+  init();
 }
 
 
-Minitel::Minitel(int rx, int tx) : SoftwareSerial(rx,tx) {
-	init();
+Minitel::Minitel(int rx, int tx) : SoftwareSerial(rx, tx) {
+  init();
 }
 
 void Minitel::init() {
-	Serial.begin(1200);
-	begin(1200);
-	useDefaultColors();
-	refreshSettings();
+  Serial.begin(1200);
+  begin(1200);
+  useDefaultColors();
+  refreshSettings();
 }
 
 byte Minitel::getGraphicChar(String s) {
-  byte carac= 32; // caractère pixel
+  byte carac = 32; // caractère pixel
 
   if (s.length() == 6) {
     carac += s[0] == '0' ? 0 : 1;
@@ -55,44 +55,42 @@ byte Minitel::getGraphicChar(String s) {
     return carac;
   }
   return 9;
-
-
 }
 
 void Minitel::serialprint7(byte b) {
   boolean  i = false;
-  for(int j = 0; j<8;j++) {
-    if (bitRead(b,j)==1) {
-      i =!i; //calcul de la parité
+  for (int j = 0; j < 8; j++) {
+    if (bitRead(b, j) == 1) {
+      i = !i; //calcul de la parité
     }
   }
   if (i) {
-    bitWrite(b,7,1); //ecriture de la partié
+    bitWrite(b, 7, 1); //ecriture de la partié
   }
   else {
-    bitWrite(b,7,0); //ecriture de la partié
+    bitWrite(b, 7, 0); //ecriture de la partié
   }
   write(b); //ecriture du byte sur le software serial
 }
 
 
 
-void Minitel::graphic(String s, int x, int y){
+void Minitel::graphic(String s, int x, int y) {
   moveCursorTo(x, y);
-  graphic(s); 
+  graphic(s);
 }
 
 void Minitel::graphic(String s) {
-  serialprint7(getGraphicChar(s)); 
+  serialprint7(getGraphicChar(s));
 }
 
-void Minitel::textByte(byte c) {
-  serialprint7(c);
+void Minitel::textByte(byte b) {
+  serialprint7(b);
 }
 
 void Minitel::textByte(byte b, int x, int y) {
   moveCursorTo(x, y);
-  textByte(b);  
+  textByte(b);
 }
 
 
@@ -107,12 +105,12 @@ boolean Minitel::textChar(byte c) {
 
 boolean Minitel::textChar(byte c, int x, int y) {
   moveCursorTo(x, y);
-  return textChar(c);  
+  return textChar(c);
 }
 
 
 void Minitel::text(String s, int x, int y) {
-  text(s, x, y, HORIZONTAL); 
+  text(s, x, y, HORIZONTAL);
 }
 
 
@@ -127,15 +125,17 @@ void Minitel::text(String s, int x, int y, int orientation) {
 }
 
 void Minitel::text(String s, int orientation) {
-  for (int i=0; i<s.length(); i++) {
+  for (unsigned int i = 0; i < s.length(); i++) {
     char c = s.charAt(i);
     boolean indent = false;
     if (isAccent(c)) {
-      i+=1; // chars with accents take 2 array indexes
+      i += 1; // chars with accents take 2 array indexes
       c = s.charAt(i);
       indent = printAccentChar(c);
     }
     else {
+    
+      // TODO Check if c cedil
       indent = textChar(c);
     }
     if (indent && orientation == VERTICAL) {
@@ -148,125 +148,150 @@ void Minitel::text(String s, int orientation) {
 
 // Characters
 /*
- String chars0 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"; // 0 -> 33
- String chars1= "!\"#$%&'()*+,-./0123456789:;<=>?@"; // 33 -> 64
- String chars2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // 65 -> 90
- String chars3 = "abcdefghijklmnopqrstuvwxyz"; // 97 -> 122
+  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx // 0 -> 32
+  !"#$%&'()*+,-./0123456789:;<=>?@ // 33 -> 64
+  ABCDEFGHIJKLMNOPQRSTUVWXYZ[\] // 65 -> 93
+  x // 94 up arrow
+  _ // 95 lower pipe associated to underscore
+  x // 96 pipe 
+  abcdefghijklmnopqrstuvwxyz // 97 -> 122
+  // 123 124 125 126 various pipes
 */
+
+// Used to display characters sent from the Arduino
+// As a result, not all Minitel supported characters can be sent to/from Arduino
+// However, they can be displayed using the specialChar() or graphic functions
+
 byte Minitel::getCharByte(char c) {
   String characters = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]x_xabcdefghijklmnopqrstuvwxyz";
   return (byte) characters.lastIndexOf(c);
 }
 
-void Minitel::specialChar(byte c, int x, int y) {
-  moveCursorTo(x, y);
-  specialChar(c);
+// 
+boolean Minitel::isSerializableKey() {
+		return (_characterKey >= 33 && _characterKey <= 122 && _characterKey != 94 && _characterKey != 96);
 }
 
-void Minitel::specialChar(byte c) {
-  if (c == SPE_CHAR_BOOK || c == SPE_CHAR_PARAGRAPH
-    || c == SPE_CHAR_ARROW_LEFT || c == SPE_CHAR_ARROW_UP
-    || c == SPE_CHAR_ARROW_RIGHT || c == SPE_CHAR_ARROW_DOWN 
-    || c == SPE_CHAR_CIRCLE || c == SPE_CHAR_MINUS_PLUS
-    || c == SPE_CHAR_1_4 || c == SPE_CHAR_1_2
-    || c == SPE_CHAR_3_4 || c == SPE_CHAR_UPPER_OE
-    || c == SPE_CHAR_LOWER_OE || c == SPE_CHAR_BETA) {
+void Minitel::specialChar(byte b, int x, int y) {
+  moveCursorTo(x, y);
+  specialChar(b);
+}
+
+void Minitel::specialChar(byte b) {
+ if (isValidChar(b)) {
     serialprint7(25);
-    serialprint7(c);
+    serialprint7(b);
+	if (b == 75) {
+		serialprint7(99);
+	}
   }
 }
 
-
-
 boolean Minitel::isValidChar(byte index) {
-  if (index >= 32 && index < 123) {
-    return true; 
+  if (index >= 32 && index <= 123) {
+    return true;
   }
   return false;
 }
 
+//
+//
+// ACCENTS HANDLING
+//
+//
+
 
 boolean Minitel::isAccent(char c) {
-  String accents = "áàâäéèëêíìîïóòôöúùûü";
-  if (accents.indexOf(c) >=0) {
-    return true; 
+  //String accents = "àáâäèéêëìíîïòóôöùúûü";
+  if (accents.indexOf(c) >= 0) {
+    return true;
   }
   return false;
 }
 
 
 boolean Minitel::printAccentChar(char c) {
-  if (isAccent(c)) {
-	String accents = "áàâäéèëêíìîïóòôöúùûü";
-    int index = (accents.indexOf(c)-1)/2;
-
-    int accentTypeIndex = index%4;
+    //String accents = "àáâäèéêëìíîïòóôöùúûü";
+    
+    int index = (accents.indexOf(c)) / 2;
+    int accentTypeIndex = index % 4;
     printAccent(accentTypeIndex);
 
-    int letterIndex = floor(index/4);
+	// Check which letter
+    int letterIndex = floor(index / 4);
     char letter = getAccentLetter(letterIndex);
     textChar(letter);
-
-    return true;
-  }
-  return false;
+    
+    return true; // There should be no pb printing accents
 }
 
 void Minitel::printAccent(int index) {
-  serialprint7(25);
-  switch(index) {
-    case(0) :
-    serialprint7(GRAVE);
-    break; 
-    case(1) :
-    serialprint7(ACCUTE);
-    break; 
-    case(2) :
-    serialprint7(CIRCUMFLEX);
-    break; 
-  default :
-    serialprint7(UMLAUT);
+  switch (index) {
+    case (0) :
+      specialChar(SPE_CHAR_GRAVE);
+      break;
+    case (1) :
+      specialChar(SPE_CHAR_ACUTE);
+      break;
+    case (2) :
+      specialChar(SPE_CHAR_CIRCUMFLEX);
+      break;
+    default :
+      specialChar(SPE_CHAR_UMLAUT);
   }
 }
 
 char Minitel::getAccentLetter(int letterIndex) {
-  switch(letterIndex) {
-    case(0) :
-    return('a');
-    break; 
-    case(1) :
-    return('e');
-    break; 
-    case(2) :
-    return('i');
-    break; 
-    case(3) :
-    return('o');
-    break;
-  default :
-    return('u');
-  }  
+  switch (letterIndex) {
+    case (0) :
+      return ('a');
+      break;
+    case (1) :
+      return ('e');
+      break;
+    case (2) :
+      return ('i');
+      break;
+    case (3) :
+      return ('o');
+      break;
+    default :
+      return ('u');
+  }
 }
+
+
+//
+//
+// REPEAT CHARACTER
+//
+//
 
 void Minitel::repeat(byte n) {
   serialprint7(18);
-  serialprint7(64+n);
+  serialprint7(64 + n);
 }
+
+//
+//
+// COLOR MANAGEMENT
+//
+//
 
 
 void Minitel::bgColor(byte c) {
-  if (c >= 0 && c <=7) {
+  if (c >= 0 && c <= 7) {
     serialprint7(27);
-    serialprint7(c+80);
+    serialprint7(c + 80);
     _currentBgColor = c;
   }
 }
 
 
 void Minitel::textColor(byte c) {
-  if (c >= 0 && c <=7) {
+  if (c >= 0 && c <= 7) {
     serialprint7(27);
-    serialprint7(c+64);
+    serialprint7(c + 64);
     _currentTextColor = c;
   }
 }
@@ -274,14 +299,19 @@ void Minitel::textColor(byte c) {
 
 void Minitel::useDefaultColors() {
   bgColor(BLACK);
-  textColor(WHITE); 
+  textColor(WHITE);
 }
 
+//
+//
+// MOVING AND POSITIONNING THE CURSOR
+//
+//
 
 void Minitel::moveCursorTo(byte x, byte y) {
   serialprint7(31); // Code positionnement de curseur
-  serialprint7(64+y); // coordonnées x (x+64) (x de 1 à 40)
-  serialprint7(64+x); // coordonnées y (y+64) (y de 1 à 24)
+  serialprint7(64 + y); // coordonnées x (x+64) (x de 1 à 40)
+  serialprint7(64 + x); // coordonnées y (y+64) (y de 1 à 24)
   refreshSettings();
 }
 
@@ -317,12 +347,18 @@ void Minitel::moveCursorTo(byte location) {
 
 void Minitel::moveCursor(byte dir, int n) {
   if (dir == LEFT || dir == RIGHT || dir == UP || dir == DOWN) {
-    for (int i=0; i<n; i++) {
+    for (int i = 0; i < n; i++) {
       serialprint7(dir);
     }
   }
 }
 
+//
+//
+// RESTORING THE CURRENT SETTINGS AS
+// SOME COMMANDS SEEM TO RESET THEM
+//
+//
 
 void Minitel::refreshSettings() {
   // Common parameters
@@ -343,16 +379,23 @@ void Minitel::refreshSettings() {
 }
 
 
+//
+//
+// SHOW / HIDE CURSOR
+//
+//
+
+
 void Minitel::cursor() {
-  cursor(true); 
+  cursor(true);
 }
 
 void Minitel::noCursor() {
-  cursor(false); 
+  cursor(false);
 }
 
 void Minitel::cursor(boolean b) {
-  if(b) {
+  if (b) {
     serialprint7(CURSOR_SHOW);
   }
   else {
@@ -361,18 +404,29 @@ void Minitel::cursor(boolean b) {
   _currentShowCursor = b;
 }
 
+//
+//
+// CLEANING SYSTEM
+//
+//
+
 
 void Minitel::clearScreen() {
   serialprint7(CLEARSCREEN);
   refreshSettings();
 }
 
+//
+//
+// TEXT OR GRAPHIC MODE SELECTION
+//
+//
 
 void Minitel::mode(byte mode) {
   if (mode == GRAPHIC_MODE || mode == TEXT_MODE) {
     _currentMode = mode;
     refreshSettings();
-  } 
+  }
 }
 
 void Minitel::graphicMode() {
@@ -383,20 +437,25 @@ void Minitel::textMode() {
   mode(TEXT_MODE);
 }
 
+//
+//
+//
+//
+//
 
 void Minitel::blink() {
-  blink(true); 
+  blink(true);
 }
 
 void Minitel::noBlink() {
-  blink(false); 
+  blink(false);
 }
 
 
 void Minitel::blink(boolean b) {
   serialprint7(27);
   if (b) {
-    serialprint7(BLINK_ON); 
+    serialprint7(BLINK_ON);
   }
   else {
     serialprint7(BLINK_OFF);
@@ -421,24 +480,24 @@ void Minitel::incrustation(boolean b) {
   }
   else {
     serialprint7(INCRUSTATION_OFF);
-  } 
+  }
 }
 
 void Minitel::incrustation() {
-	incrustation(INCRUSTATION_ON);
+  incrustation(INCRUSTATION_ON);
 }
 
 void Minitel::noIncrustation() {
-    incrustation(INCRUSTATION_OFF);
+  incrustation(INCRUSTATION_OFF);
 }
 
 
 void Minitel::pixelate() {
-  pixelate(true); 
+  pixelate(true);
 }
 
 void Minitel::noPixelate() {
-  pixelate(false); 
+  pixelate(false);
 }
 
 
@@ -449,7 +508,7 @@ void Minitel::pixelate(boolean b) {
   }
   else {
     serialprint7(UNDERLINE_OFF);
-  } 
+  }
   _currentUnderline = b;
 }
 
@@ -461,15 +520,15 @@ void Minitel::lineMask(boolean b) {
   }
   else {
     serialprint7(LINE_MASK_OFF);
-  } 
+  }
 }
 
 void Minitel::lineMask() {
-    lineMask(LINE_MASK_ON);
+  lineMask(LINE_MASK_ON);
 }
 
 void Minitel::noLineMask() {
-    lineMask(LINE_MASK_OFF);
+  lineMask(LINE_MASK_OFF);
 }
 
 void Minitel::video(byte v) {
@@ -477,437 +536,177 @@ void Minitel::video(byte v) {
     serialprint7(27);
     serialprint7(v);
     _currentVideo = v;
-  } 
+  }
 }
 
 void Minitel::standardVideo() {
-  video(VIDEO_STANDARD); 
+  video(VIDEO_STANDARD);
 }
 
 void Minitel::invertVideo() {
-  video(VIDEO_INVERT); 
+  video(VIDEO_INVERT);
 }
 
 void Minitel::transparentVideo() {
-  video(VIDEO_TRANSPARENT); 
+  video(VIDEO_TRANSPARENT);
 }
 
 
 void Minitel::setMaxSpeed() {
   /*
-  serialprint7(27);
-   serialprint7(SPEED_4800);
-   */
+    serialprint7(27);
+    serialprint7(SPEED_4800);
+  */
 }
 
-// Bip
+//
+//
+// SOUND
+//
+//
+
 // Less than 200ms isn't taken into account
-void Minitel::bip(long duration) {
-  long beginTime = millis();
-  while(millis() < beginTime+100) {//duration) {
+void Minitel::bip(unsigned long duration) {
+  unsigned long beginTime = millis();
+  while (millis() < beginTime + 100ul) { //duration) {
     serialprint7(27);
     serialprint7(BIP);
     delay(100);
   }
 }
 
-byte Minitel::getKeyCode() {
-	byte b = 255;
-	b = read();		
-	if (b != 255) {
-		Serial.println(b);
-	}
-	return b;
-}
+//
+//
+// KEYSTROKES ANALYSIS AND LOGGING
+//
+//
 
-char Minitel::getKey() {
-  byte b = 255; 
+/*
+	Read and decode keyboard input and store values in according variables
+	_specialCharacterKey if a special character Jeu G2, schema 2.8 p103
+	_characterKey if a normal character Jeu G0, schema 2.5 p 100
+	_menuKey is a menu key
+*/
+
+void Minitel::readKey() {
+
+	_menuKey = -1;
+	_specialCharacterKey = -1;
+	_characterKey = -1;
+
+
+  byte b = 255;
   b =  read();
-  char c = '^';
 
-  // Menu keys
+  // Menu keys start with 147 + another number
   if (b == 147) {
-  	_menuKeyPressed = true;
-  	delay(50);
-  }
-  else if (_menuKeyPressed) {
-	if (b == 198) { // Sommaire
-		c = '1';
-	
-} 
-	
-else if (b == 197) { // Annul
-		c = '2';
-	
-} 
-	
-else if (b == 66) { // Retour
-		c = '3';
-	
-} 
-	
-else if (b == 195) { // Répétition
-		c = '4';
-	
-} 
-	
-else if (b == 68) { // Guide
-		c = '5';
-	
-} 
-	
-else if (b == 71) { // Correction
-		c = '6';
-	
-} 
-	
-else if (b == 72) { // Suite
-		c = '7';
-	
-} 
-	
-else if (b == 65) { // Envoi
-		c = '8';
-	
-} 
-	_menuKeyPressed = false;
-  }
-  else {
-	if (b == 160) { // Space
-		c = ' ';
-	}
 
-	else if (b == 177) { // 1
-		c = '1';
-	
-} 
-	
-else if (b == 178) { // 2
-		c = '2';
-	
-} 
-	
-else if (b == 51) { // 3
-		c = '3';
-	
-} 
-	
-else if (b == 180) { // 4
-		c = '4';
-	
-} 
-	
-else if (b == 53) { // 5
-		c = '5';
-	
-} 
-	
-else if (b == 54) { // 6
-		c = '6';
-	
-} 
-	
-else if (b == 183) { // 7
-		c = '7';
-	
-} 
-	
-else if (b == 184) { // 8
-		c = '8';
-	
-} 
-	
-else if (b == 57) { // 9
-		c = '9';
-	
-} 
-	
-else if (b == 48) { // 0
-		c = '0';
-	
-} 
-	
-else if (b == 170) { // *
-		c = '*';
-	
-} 
-	
-else if (b == 163) { // #
-		c = '#';
-	
-} 
-	
-else if (b == 172) { // ,
-		c = ',';
-	
-} 
-	
-else if (b == 46) { // .
-		c = '.';
-	
-} 
-	
-else if (b == 39) { // '
-		c = '\'';
-	
-} 
-	
-else if (b == 187) { // ;
-		c = ';';
-	
-} 
-	
-else if (b == 45) { // -
-		c = '-';
-	
-} 
-	
-else if (b == 58) { // :
-		c = ':';
-	
-} 
-	
-else if (b == 63) { // ?
-		c = '?';
-	
-} 
-	
-else if (b == 65) { // A
-		c = 'A';
-	
-} 
-	
-else if (b == 66) { //  B
-		c = 'B';
-	
-} 
-	
-else if (b == 195) { // C
-		c = 'C';
-	
-} 
-	
-else if (b == 68) { // D
-		c = 'D';
-	
-} 
-	
-else if (b == 197) { // E
-		c = 'E';
-	
-} 
-	
-else if (b == 198) { // F
-		c = 'F';
-	
-} 
-	
-else if (b == 71) { // G
-		c = 'G';
-	
-} 
-	
-else if (b == 72) { // H
-		c = 'H';
-	
-} 
-	
-else if (b == 201) { // I
-		c = 'I';
-	
-} 
-	
-else if (b == 202) { // J
-		c = 'J';
-	
-} 
-	
-else if (b == 75) { // K
-		c = 'K';
-	
-} 
-	
-else if (b == 204) { // L
-		c = 'L';
-	
-} 
-	
-else if (b == 77) { // M
-		c = 'M';
-	
-} 
-	
-else if (b == 78) { // N
-		c = 'N';
-	
-} 
-	
-else if (b == 207) { // O
-		c = 'O';
-	
-} 
-	
-else if (b == 80) { // P
-		c = 'P';
-	
-} 
-	
-else if (b == 209) { // Q
-		c = 'Q';
-	
-} 
-	
-else if (b == 210) { // R
-		c = 'R';
-	
-} 
-	
-else if (b == 83) { // S
-		c = 'S';
-	
-} 
-	
-else if (b == 212) { // T
-		c = 'T';
-	
-} 
-	
-else if (b == 85) {  //U
-		c = 'U';
-	
-} 
-	
-else if (b == 86) { // V
-		c = 'V';
-	
-} 
-	
-else if (b == 215) { // W
-		c = 'W';
-	
-} 
-	
-else if (b == 216) { // X
-		c = 'X';
-	
-} 
-	
-else if (b == 89) { // Y
-		c = 'Y';
-	
-} 
-	
-else if (b == 90) { // Z
-		c = 'Z';
-	
-}
-	
-else if (b == 33) { // !
-		c = '!';
-	
-}
-	
-else if (b == 34) { // !
-		c = '"';
-	
-}
-	
-else if (b == 163) { // #
-		c = '#';
-	
-}
-	
-else if (b == 36) { // $
-		c = '$';
-	
-}
-	
-else if (b == 165) { // %
-		c = '%';
-	
-}
-	
-else if (b == 166) { // &
-		c = '&';
-	
-}
-	
-else if (b == 39) { // '
-		c = '\'';
-	
-}
-	
-else if (b == 40) { // (
-		c = '(';
-	
-}
-	
-else if (b == 169) { // )
-		c = ')';
-	
-}
-	
-else if (b == 219) { // [
-		c = '[';
-	
-}
-	
-else if (b == 222) { // ↑
-		c = '↑';
-	
-}
-	
-else if (b == 221) { // ]
-		c = '[';
-	
-}
-	
-else if (b == 60) { // < 
-		c = '<';
-	
-}
-	
-else if (b == 190) { // >
-		c = '>';
-	
-}
-	
-else if (b == 192) { // @
-		c = '@';
-	
-}
-	
-else if (b == 43) { // +
-		c = '+';
-	
-}
-	
-else if (b == 189) { // =
-		c = '=';
-	
-}
-	
-else if (b == 170) { // *
-		c = '*';
-	
-}
-	
-else if (b == 175) { // /
-		c = '/';
-	
-}
-	
-else if (b == 123) { // /
-		c = '|';
-	
-}
+	_accentKey = -1; // Drop previously set accent
+	delay(50); // Wait a bit
+    _menuKey = read(); // Read the next byte
+    
+  }
+  
+  // Shift or Ctrl key with GP2 character set start with 153
+  else if (b == 153) {
+	 _accentKey = -1; // Drop previously set accent
+	 
+	  delay(50); // Wait a bit
+      b = read(); // Read the next byte
+
+	  if (b == 65 || b == 66 || b == 72 || b == 195) { // Accent key
+	  	_accentKey = b % 128;
+	  	return;	
+	  }
+	  
+	  else {
+	  	_specialCharacterKey = b % 128;
+	  
+		  if (b == 75) { // Special case for the ç
+		  	delay(50); // Wait a bit
+	  		b = read(); // Read the next byte
+		  	if (b == 99) {
+		  		_specialCharacterKey = 75; // Implicit cedil with implicit c
+	  		}
+		  }
+	  }
+  }
+  
+  // Non prefixed keys
+  else if (b != 255) {
+	_characterKey = b % 128;
+	
+	// If an accent key was pressed before check if character can have this an accent
+	if (_characterKey ==  97 || _characterKey ==  101 || _characterKey == 105 || _characterKey == 111 || _characterKey == 117 ) {
+	
+		// Remove accents if not supported by this letter
+		if (_characterKey == 97 && _accentKey == SPE_CHAR_ACUTE ) { // a
+			_accentKey = -1;
+		}
+		else if (_characterKey == 105 && (_accentKey == SPE_CHAR_GRAVE || _accentKey == SPE_CHAR_ACUTE )) { // i
+			_accentKey = -1;
+		}
+		else if (_characterKey == 111 && (_accentKey == SPE_CHAR_GRAVE || _accentKey == SPE_CHAR_ACUTE )) { // o
+			_accentKey = -1;
+		}
+		else if (_characterKey == 117 && _accentKey == SPE_CHAR_ACUTE ) { // u
+			_accentKey = -1;
+		}
 	}
-	return c;
+	else {
+		_accentKey = -1;
+	}
+  }
+}
+
+
+//
+//
+// KEYS GETTERS
+//
+//
+
+boolean Minitel::keyTyped() {
+	return isMenuKey() || isCharacterKey() || isSpecialCharacterKey() || accentKeyStored() ;
 }
 
 boolean Minitel::isMenuKey() {
-	return _menuKeyPressed;
+	return _menuKey != -1;
 }
+
+int Minitel::getMenuKey() {
+	return _menuKey;
+}
+
+boolean Minitel::isSpecialCharacterKey() {
+	return _specialCharacterKey != -1;
+}
+
+int Minitel::getSpecialCharacterKey() {
+	return _specialCharacterKey;
+}
+
+boolean Minitel::isCharacterKey() {
+	return _characterKey != -1;
+}
+
+char Minitel::getCharacterKey() {
+	return _characterKey;
+}
+
+boolean Minitel::accentKeyStored() {
+	return _accentKey != -1;
+}
+
+int Minitel::getAccentKey() {
+	return _accentKey;
+}
+
+//
+//
+// DRAWING FUNCTIONS
+//
+//
 
 void Minitel::rect(char c, int x, int y, int w, int h) {
   byte b = getCharByte(c);
@@ -915,24 +714,24 @@ void Minitel::rect(char c, int x, int y, int w, int h) {
 }
 
 void Minitel::rect(byte c, int x, int y, int w, int h) {
-  moveCursorTo(x, y); 
+  moveCursorTo(x, y);
   textByte(c);
   repeat(w);
-  moveCursorTo(x, y+1);
-  for (int i=0; i<h-2; i++) {
+  moveCursorTo(x, y + 1);
+  for (int i = 0; i < h - 2; i++) {
     textByte(c);
     moveCursor(DOWN);
-    moveCursor(LEFT); 
+    moveCursor(LEFT);
   }
-  moveCursorTo(x+w, y+1);
-  for (int i=0; i<h-2; i++) {
+  moveCursorTo(x + w, y + 1);
+  for (int i = 0; i < h - 2; i++) {
     textByte(c);
     moveCursor(DOWN);
-    moveCursor(LEFT); 
+    moveCursor(LEFT);
   }
-  moveCursorTo(x, y+h-1);
+  moveCursorTo(x, y + h - 1);
   textByte(c);
-  repeat(w);  
+  repeat(w);
 }
 
 void Minitel::spiral(int x, int y, int siz, int c) {
@@ -940,26 +739,26 @@ void Minitel::spiral(int x, int y, int siz, int c) {
   // Center
   specialChar(c, x, y);
   x++;
-  // Spiral    
-  for (int i=0; i< siz; i++) {
-    for (int j=0; j<curSiz; j++) {
+  // Spiral
+  for (int i = 0; i < siz; i++) {
+    for (int j = 0; j < curSiz; j++) {
       specialChar(c, x, y);
       y++;
     }
     curSiz++;
-    for (int j=0; j<curSiz; j++) {
+    for (int j = 0; j < curSiz; j++) {
       specialChar(c, x, y);
       x--;
     }
-    for (int j=0; j<curSiz; j++) {
+    for (int j = 0; j < curSiz; j++) {
       specialChar(c, x, y);
       y--;
     }
-    curSiz++;   
-    for (int j=0; j<curSiz; j++) {
+    curSiz++;
+    for (int j = 0; j < curSiz; j++) {
       specialChar(c, x, y);
       x++;
-    }    
+    }
   }
 }
 
