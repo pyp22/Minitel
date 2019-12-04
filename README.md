@@ -1,3 +1,5 @@
+#Operating Minitel can be seen on my [Youtube channel](https://www.youtube.com/watch?v=qKik8KSsj04&t)
+
 #Minitel library for Arduino
 
 This library provides a way to create screens for the [Minitel](https://en.wikipedia.org/wiki/Minitel) without having to dig into the complexity of the system.
